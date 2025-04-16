@@ -23,7 +23,7 @@ class RolePermissionSeeder extends Seeder
             'Member' => ['member.view', 'member.add', 'member.update', 'member.delete'],
             'Founders' => ['founders.view', 'founders.add', 'founders.update', 'founders.delete'],
             'Activities' => ['activities.view', 'activities.add', 'activities.update', 'activities.delete'],
-            'RolesAndPermissions' => ['r&p.view', 'r&p.add', 'r&p.update', 'r&p.delete'],
+            'settings' => ['settings.view', 'settings.update'],
             
         ];
     

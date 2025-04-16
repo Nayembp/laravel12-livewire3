@@ -19,19 +19,22 @@ class EditRolePermission extends Component
     {
         $this->roleId = $id;
         $this->currentRole = Role::with('permissions')->findOrFail($id);
-        $this->selectedPermissions = $this->currentRole->permissions->pluck('id')->toArray();
-
+        $this->selectedPermissions = $this->currentRole->permissions->pluck('name')->toArray(); 
+    
         $groups = User::getpermissionGroups();
         $this->permission_groups = $groups;
-
+    
         foreach ($groups as $group) {
             $this->groupPermissions[$group->group_name] =
-                User::getpermissionByGroupName($group->group_name)->pluck('id')->toArray();
+                User::getpermissionByGroupName($group->group_name)->pluck('name')->toArray(); 
         }
     }
 
     public function render()
     {
+        abort_unless(auth()->user()->can('settings.view'), 403);
+        abort_unless(auth()->user()->hasRole('super-admin'), 403);
+        
         return view('livewire.auth.edit-role-permission');
     }
 
@@ -54,14 +57,11 @@ class EditRolePermission extends Component
 
     public function updatePermission()
     {
-        if (!$this->currentRole) {
-            session()->flash('message', 'No role selected.');
-            return;
-        }
-
+        abort_unless(auth()->user()->can('settings.edit'), 403);
+        abort_unless(auth()->user()->hasRole('super-admin|admin'), 403);
+        
         $this->currentRole->syncPermissions($this->selectedPermissions);
-
-        session()->flash('message', 'Permissions updated successfully.');
+        $this->dispatch('toast', message: 'Permissions updated!', type: 'success');
         return redirect()->route('rolepermission.index');
     }
 }

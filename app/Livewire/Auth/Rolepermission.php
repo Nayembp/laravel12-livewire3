@@ -11,6 +11,7 @@ class Rolepermission extends Component
 {
     use WithPagination;
 
+    public $search = '';
     public $showAddRoleForm = false;
     public $showEditRoleForm = false;
 
@@ -21,21 +22,30 @@ class Rolepermission extends Component
 
     public function render()
     {
+        abort_unless(auth()->user()->can('settings.edit'), 403);
+        abort_unless(auth()->user()->hasRole('super-admin|admin'), 403);
         
-        $roles = Role::with('permissions')->latest()->paginate(10);
+        $roles = Role::with('permissions')
+            ->when($this->search, fn($query) => 
+                $query->where('name', 'like', '%' . $this->search . '%')
+            )
+            ->latest()
+            ->paginate(10);
+
         $permissions = Permission::all();
+
         return view('livewire.auth.rolepermission', [
             'roles' => $roles,
             'permissions' => $permissions
         ]);
     }
-
    
 
     public function loadRoles()
     {
         $this->roles = Role::with('permissions')->latest()->get();
     }
+
 
     public function addRoleForm()
     {
@@ -46,15 +56,18 @@ class Rolepermission extends Component
    
     public function roleStore()
     {
+        abort_unless(auth()->user()->can('settings.edit'), 403);
+        abort_unless(auth()->user()->hasRole('super-admin|admin'), 403);
+        
         $validated = $this->validate([
             'RoleName' => 'required|string|min:3|unique:roles,name',
         ]);
 
         Role::create(['name' => $validated['RoleName']]);       
-
+        $this->dispatch('toast', message: 'New role created!',type: 'success');
         $this->reset(['RoleName', 'showAddRoleForm']);
         $this->resetErrorBag();
-        $this->dispatch('toast', message: 'Role added successfully!');
+       
     }
 
     public function editRole($id)
@@ -70,6 +83,10 @@ class Rolepermission extends Component
 
     public function updateRole()
     {
+
+        abort_unless(auth()->user()->can('settings.edit'), 403);
+        abort_unless(auth()->user()->hasRole('super-admin|admin'), 403);
+        
         $this->validate([
             'RoleName' => 'required|string|min:3|unique:roles,name,' . $this->editingRoleId,
         ]);
@@ -78,18 +95,30 @@ class Rolepermission extends Component
         $role->name = $this->RoleName;
         $role->save();
 
-        session()->flash('message', 'Role updated successfully!');
+        $this->dispatch('toast', message: 'Role Updated!',type: 'success');
         $this->reset(['RoleName', 'editingRoleId', 'showEditRoleForm']);
         $this->resetErrorBag();
-        $this->loadRoles(); // Refresh list live
     }
 
     public function deleteRole($id)
     {
-        $role = Role::findOrFail($id);
-        $role->delete();
-       
-        $this->dispatch('toast', ['message' => 'Role deleted successfully!']);
-
+        abort_unless(auth()->user()->can('settings.edit'), 403);
+        abort_unless(auth()->user()->hasRole('super-admin|admin'), 403);
+        
+        try {
+            $role = Role::findOrFail($id);
+            $role->delete();
+            
+            $this->dispatch('toast', 
+                message: 'Role deleted!',
+                type: 'success'
+            );
+            
+        } catch (\Exception $e) {
+            $this->dispatch('toast', 
+                message: 'Failed to delete role: ' . $e->getMessage(),
+                type: 'error'
+            );
+        }
     }
 }

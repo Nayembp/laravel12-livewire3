@@ -10,18 +10,17 @@
             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
                 Edit Role's Permission
             </h3>
-            <a href="#"
-               class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+            <flux:button wire:navigate href="{{ route('rolepermission.index') }}" icon="arrow-left" variant="danger" size="xs">
                 Back
-            </a>
+            </flux:button>
         </div>
 
         <form wire:submit.prevent="updatePermission">
             <div class="space-y-6">
                 <div>
-                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Role Name:</label>
+                    
                     <div class="mt-1 text-gray-900 dark:text-gray-100 font-semibold">
-                        {{ $currentRole->name }}
+                        Role Name: <span class="font-semibold text-green-600 dark:text-green-400">{{ $currentRole->name }}</span> 
                     </div>
                 </div>
 
@@ -46,27 +45,30 @@
                         </div>
 
                         <div class="flex flex-wrap gap-4">
+                           <!-- Change this section in your blade file -->
                             @foreach($permissions as $permission)
-                                <div class="flex items-center space-x-1">
-                                    <input type="checkbox"
-                                           wire:model="selectedPermissions"
-                                           value="{{ $permission->id }}"
-                                           id="perm_{{ $permission->id }}"
-                                           class="text-indigo-600 dark:bg-gray-700 dark:border-gray-600 rounded">
-                                    <label for="perm_{{ $permission->id }}"
-                                           class="text-sm text-gray-700 dark:text-gray-300">
-                                        {{ $permission->name }}
-                                    </label>
-                                </div>
+                            <div class="flex items-center space-x-1">
+                                <input type="checkbox"
+                                    wire:model="selectedPermissions"
+                                    value="{{ $permission->name }}" 
+                                    id="perm_{{ $permission->id }}"
+                                    class="text-indigo-600 dark:bg-gray-700 dark:border-gray-600 rounded">
+                                <label for="perm_{{ $permission->id }}"
+                                    class="text-sm text-gray-700 dark:text-gray-300">
+                                    {{ $permission->name }}
+                                </label>
+                            </div>
                             @endforeach
                         </div>
                     </div>
                 @endforeach
+                <div class="flex justify-end">      
+                    <flux:button type="submit" class="mt-2" size="sm">
+                        Assign permission
+                    </flux:button>
+                </div>  
 
-                <button type="submit"
-                        class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-md shadow-sm">
-                    Submit
-                </button>
+               
             </div>
         </form>
     </div>

@@ -16,10 +16,7 @@
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
                 </flux:navlist.group>
 
-                <flux:navlist.item icon="users" :href="route('rolepermission.index')" :current="request()->routeIs('rolepermission.index')" wire:navigate>{{ __('Manage Members') }}</flux:navlist.item>
-                                
-                <flux:navlist.item icon="key" :href="route('rolepermission.index')" :current="request()->routeIs('rolepermission.index')" wire:navigate>{{ __('Permission Manage') }}</flux:navlist.item>
-                
+               
             </flux:navlist>
 
             <flux:spacer />
@@ -27,6 +24,10 @@
             
             <!-- Desktop User Menu -->
             <flux:dropdown position="bottom" align="start">
+                @if(Auth::user()->can('settings.view'))
+                    <flux:navlist.item icon="users" :href="route('user.index')" :current="request()->routeIs('user.index')" wire:navigate>{{ __('User Manage') }}</flux:navlist.item>
+                    <flux:navlist.item icon="cog-6-tooth" :href="route('settings.globalsettings')" :current="request()->routeIs('settings.globalsettings')" wire:navigate>{{ __('App Settings') }}</flux:navlist.item>
+                @endif               
                 <flux:profile
                     :name="auth()->user()->name"
                     :initials="auth()->user()->initials()"
@@ -125,24 +126,8 @@
 
         @fluxScripts  
         
-        <div       
-            x-data="{ show: false, message: '' }"
-            x-show="show"
-            x-cloak
-            x-transition
-            x-init="
-                Livewire.on('toast', (message) => {
-                    this.message = message;
-                    this.show = true;
-                    setTimeout(() => this.show = false, 3000);
-                });
-            "
-            class="fixed top-5 right-5 z-50 px-4 py-3 bg-green-500 text-white rounded shadow"
-        >
-       
-            <span x-text="message"></span>
-        </div>
-
+        @include('components.tost')
+        
     
     </body>
 </html>
