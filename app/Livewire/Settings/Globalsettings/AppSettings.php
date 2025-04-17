@@ -36,18 +36,26 @@ class AppSettings extends Component
     {
         $this->validate([
             'app_name' => 'required|string|max:255',
-            'app_logo' => 'nullable|image|max:2048', // adjust size as needed
+            'app_logo' => 'nullable|image|max:2048', 
         ]);
-
+      
         $this->setSetting('app_name', $this->app_name);
 
+        
         if ($this->app_logo) {
-            $path = $this->app_logo->store('uploads/logo','public');            
+            $oldLogo = settings('app_logo');
+
+            if ($oldLogo && file_exists(public_path('storage/' . $oldLogo))) {
+                unlink(public_path('storage/' . $oldLogo));
+            }
+            
+            $path = $this->app_logo->store('uploads/logo', 'public');
             $this->setSetting('app_logo', $path);
         }
 
         $this->dispatch('toast', message: 'Settings updated successfully!', type: 'success');
     }
+
 
 
 

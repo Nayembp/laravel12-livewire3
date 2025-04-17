@@ -27,17 +27,24 @@
                 @endif
             </div>
 
+
+            <flux:input wire:model="image" :label="__('Image')" type="file" />
+            @if ($image)
+               
+                <img src="{{ $image->temporaryUrl() }}" alt="Profile Preview" class="w-24 h-auto mt-2">
+            @elseif ($currentImage)
+    
+                <img src="{{ asset($currentImage) }}" alt="Profile Image" class="w-24 h-auto mt-2">
+            @endif
+
+
             <div class="flex items-center gap-4">
                 <div class="flex items-center justify-end">
                     <flux:button variant="primary" type="submit" class="w-full">{{ __('Save') }}</flux:button>
-                </div>
-
-                <x-action-message class="me-3" on="profile-updated">
-                    {{ __('Saved.') }}
-                </x-action-message>
+                </div>                
             </div>
         </form>
 
-        <livewire:settings.delete-user-form />
+        {{-- <livewire:settings.delete-user-form /> --}}
     </x-settings.layout>
 </section>

@@ -64,7 +64,7 @@ class Rolepermission extends Component
         ]);
 
         Role::create(['name' => $validated['RoleName']]);       
-        $this->dispatch('toast', message: 'New role created!',type: 'success');
+        $this->dispatch('toast', message: 'New role created!', type: 'success');
         $this->reset(['RoleName', 'showAddRoleForm']);
         $this->resetErrorBag();
        
